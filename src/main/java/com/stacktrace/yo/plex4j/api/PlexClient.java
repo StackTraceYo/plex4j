@@ -1,65 +1,59 @@
 package com.stacktrace.yo.plex4j.api;
 
 import com.stacktrace.yo.plex4j.domain.PlexServer;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PlexClient {
 
-    private final CloseableHttpClient http;
     private final Map<String, PlexServer> servers;
+    private final PlexHttpClient client;
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlexClient.class);
 
     public PlexClient() {
-        this.http = HttpClients.createDefault();
         this.servers = new HashMap<>();
+        this.client = new PlexHttpClient();
+    }
+
+    public PlexClient(PlexHttpClient client) {
+        this.servers = new HashMap<>();
+        this.client = client;
     }
 
     public PlexClient addServer(PlexServer server) {
-
+        if (server != null) {
+            this.connect(server);
+        }
         this.servers.put(server.getName(), server);
         return this;
     }
 
-    public void test() throws IOException {
-
-        ResponseHandler<String> responseHandler = response -> {
-            int status = response.getStatusLine().getStatusCode();
-            if (status >= 200 && status < 300) {
-                HttpEntity entity = response.getEntity();
-                return entity != null ? EntityUtils.toString(entity) : null;
-            } else {
-                throw new ClientProtocolException("Unexpected response status: " + status);
-            }
-        };
-        HttpGet get = new HttpGet(servers.get("test").location());
-        get.addHeader("Accept", "application/json");
-        get.addHeader("X-PlexServer-Token", "nacWLAopife2xy4r2ABQ");
-
-        String x = this.http.execute(get, responseHandler);
-        System.out.println("----------------------------------------");
-        System.out.println(x);
+    private boolean connect(PlexServer server) {
+        if (server.getAuthentication().shouldLogin()) {
+            PlexRoute login = Route.LOGIN.createXML(server);
+            NameValuePair[] params = server.getAuthentication().createLoginParams();
+            Object x = this.client.postX(login, params, new NameValuePair[]{new BasicNameValuePair("X-Plex-Client-Identifier", "ahmadfaragtest")}, Object.class);
+            LOGGER.debug(x.toString());
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
 
         PlexClient client = new PlexClient()
                 .addServer(new PlexServer()
-                        .setAuthentication(new ServerAuth()
-                                .setUsername("stacktraceyo")
-                                .setPassword("Ilovemymom123"))
+                        .setName("test")
+                        .setAuthentication(new ServerAuth())
                         .setLocation(new ServerLocation()
                                 .setHost("75.118.77.167")
                                 .setPort("32400")));
-        client.test();
     }
 }
