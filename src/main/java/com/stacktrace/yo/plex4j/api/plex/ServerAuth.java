@@ -1,4 +1,4 @@
-package com.stacktrace.yo.plex4j.api;
+package com.stacktrace.yo.plex4j.api.plex;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

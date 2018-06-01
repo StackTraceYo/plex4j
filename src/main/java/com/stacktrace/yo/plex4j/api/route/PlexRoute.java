@@ -1,7 +1,7 @@
-package com.stacktrace.yo.plex4j.api;
+package com.stacktrace.yo.plex4j.api.route;
 
 
-import com.stacktrace.yo.plex4j.domain.PlexServer;
+import com.stacktrace.yo.plex4j.api.plex.PlexServer;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -43,7 +43,7 @@ public class PlexRoute {
 
     public URI toUri() throws URISyntaxException {
         if (route.serverRoute()) {
-            return new URI(server.location() + "/" + responseType.getPathResponseType(route));
+            return new URI(server.location() + responseType.getPathResponseType(route));
         } else {
             return new URI(responseType.getPathResponseType(route));
         }
@@ -52,7 +52,7 @@ public class PlexRoute {
     public URI toUriWithParams(NameValuePair[] params) throws URISyntaxException {
         URIBuilder builder;
         if (route.serverRoute()) {
-            builder = new URIBuilder(server.location() + "/" + responseType.getPathResponseType(route));
+            builder = new URIBuilder(server.location() + responseType.getPathResponseType(route));
         } else {
             builder = new URIBuilder(responseType.getPathResponseType(route));
         }

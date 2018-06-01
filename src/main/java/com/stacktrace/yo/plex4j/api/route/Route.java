@@ -1,6 +1,6 @@
-package com.stacktrace.yo.plex4j.api;
+package com.stacktrace.yo.plex4j.api.route;
 
-import com.stacktrace.yo.plex4j.domain.PlexServer;
+import com.stacktrace.yo.plex4j.api.plex.PlexServer;
 
 public enum Route {
 
@@ -19,7 +19,18 @@ public enum Route {
         public String xmlPath() {
             return this.baseUrl() + ".xml/";
         }
-    };
+    },
+    ROOT("/"),
+    SESSIONS("/status/sessions"),
+    HISTORY("/status/sessions/history/all"),
+    SEARCH("/search"),
+    SECTIONS("/library/sections"),
+    PREFS("/:/prefs"),
+    SERVERS("/servers"),
+    ONDECK("/library/onDeck"),
+    ACCOUNT("/myplex/account"),
+    SYSTEM("/system"),
+    AGENTS("/system/agents");
 
     private final String path;
 
